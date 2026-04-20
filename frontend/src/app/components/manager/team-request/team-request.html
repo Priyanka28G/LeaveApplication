@@ -1,0 +1,125 @@
+<div class="page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Team Requests</h1>
+      <p class="page-sub">Review and manage leave requests from your team</p>
+    </div>
+    <button class="refresh-btn" (click)="loadLeaves()">↻ Refresh</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total</div>
+      <div class="stat-value">{{ stats().total }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pending</div>
+      <div class="stat-value amber">{{ stats().pending }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Approved</div>
+      <div class="stat-value green">{{ stats().approved }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Rejected</div>
+      <div class="stat-value red">{{ stats().rejected }}</div>
+    </div>
+  </div>
+
+  <!-- Filter tabs -->
+  <div class="filter-tabs">
+    @for (tab of ['all', 'pending', 'approved', 'rejected']; track tab) {
+      <button class="tab-btn" [class.active]="filter() === tab" (click)="setFilter($any(tab))">
+        {{ tab | titlecase }}
+        @if (tab === 'pending' && stats().pending > 0) {
+          <span class="tab-count">{{ stats().pending }}</span>
+        }
+      </button>
+    }
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="state-box">Loading team requests...</div>
+  }
+
+  <!-- Error -->
+  @else if (error()) {
+    <div class="state-box error">{{ error() }}</div>
+  }
+
+  <!-- Empty -->
+  @else if (filtered().length === 0) {
+    <div class="empty-box">
+      <div class="empty-icon">📭</div>
+      <p class="empty-title">No {{ filter() === 'all' ? '' : filter() }} requests</p>
+      <p class="empty-sub">There are no leave requests to show here.</p>
+    </div>
+  }
+
+  <!-- Table -->
+  @else {
+    <div class="table-card">
+      <table class="leave-table">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Type</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Days</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (leave of filtered(); track leave._id) {
+            <tr [class.row-pending]="leave.status === 'pending'">
+              <td>
+                <div class="employee-cell">
+                  <div class="avatar">{{ leave.username.charAt(0).toUpperCase() }}</div>
+                  <span>{{ leave.username }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="type-badge">{{ leave.leaveType }}</span>
+              </td>
+              <td>{{ formatDate(leave.startDate) }}</td>
+              <td>{{ formatDate(leave.endDate) }}</td>
+              <td>{{ totalDays(leave) }}</td>
+              <td class="reason-cell">{{ leave.reason }}</td>
+              <td>
+                <span [class]="badgeClass(leave.status)">{{ leave.status }}</span>
+              </td>
+              <td>
+                @if (leave.status === 'pending') {
+                  <div class="action-btns">
+                    <button
+                      class="btn-approve"
+                      [disabled]="actionLoading() === leave._id"
+                      (click)="approve(leave._id!)"
+                    >
+                      {{ actionLoading() === leave._id ? '...' : '✓ Approve' }}
+                    </button>
+                    <button
+                      class="btn-reject"
+                      [disabled]="actionLoading() === leave._id"
+                      (click)="reject(leave._id!)"
+                    >
+                      {{ actionLoading() === leave._id ? '...' : '✕ Reject' }}
+                    </button>
+                  </div>
+                } @else {
+                  <span class="reviewed-label">Reviewed</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

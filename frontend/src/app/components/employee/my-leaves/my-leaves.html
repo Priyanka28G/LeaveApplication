@@ -1,0 +1,85 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">My Leaves</h1>
+      <p class="page-sub">View and track all your leave requests</p>
+    </div>
+    <a class="apply-btn" routerLink="/app/apply-leave">+ Apply Leave</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total</div>
+      <div class="stat-value">{{ stats().total }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pending</div>
+      <div class="stat-value amber">{{ stats().pending }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Approved</div>
+      <div class="stat-value green">{{ stats().approved }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Rejected</div>
+      <div class="stat-value red">{{ stats().rejected }}</div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="state-box">Loading your leaves...</div>
+  }
+
+  <!-- Error -->
+  @else if (error()) {
+    <div class="state-box error">{{ error() }}</div>
+  }
+
+  <!-- Empty -->
+  @else if (leaves().length === 0) {
+    <div class="empty-box">
+      <div class="empty-icon">📋</div>
+      <p class="empty-title">No leave requests yet</p>
+      <p class="empty-sub">Apply for your first leave to get started.</p>
+      <a class="apply-btn" routerLink="/apply-leave">+ Apply Leave</a>
+    </div>
+  }
+
+  <!-- Table -->
+  @else {
+    <div class="table-card">
+      <table class="leave-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Start date</th>
+            <th>End date</th>
+            <th>Days</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Applied on</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (leave of leaves(); track leave._id) {
+            <tr>
+              <td>
+                <span class="type-badge">{{ leave.leaveType }}</span>
+              </td>
+              <td>{{ formatDate(leave.startDate) }}</td>
+              <td>{{ formatDate(leave.endDate) }}</td>
+              <td>{{ totalDays(leave) }}</td>
+              <td class="reason-cell">{{ leave.reason }}</td>
+              <td>
+                <span [class]="badgeClass(leave.status)">{{ leave.status }}</span>
+              </td>
+              <td>{{ formatDate(leave.createdAt!) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

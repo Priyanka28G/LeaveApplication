@@ -1,0 +1,63 @@
+<div class="app-shell">
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="app-name">LeaveTrack</div>
+      <span [class]="roleBadgeClass">{{ roleLabel }}</span>
+    </div>
+    <div class="topbar-right">
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="main-body">
+    <!-- Side navigation -->
+    <nav class="sidenav">
+      @for (item of navItems; track item.label) {
+        @if (item.children) {
+          <!-- Collapsible parent — only toggles, does NOT navigate -->
+          <div
+            class="nav-item nav-parent"
+            [class.parent-active]="isChildActive(item.children)"
+            [class.expanded]="expandedItem === item.label"
+            (click)="toggleExpand(item.label)"
+          >
+            <span>{{ item.label }}</span>
+            <span class="arrow">{{ expandedItem === item.label ? '▾' : '▸' }}</span>
+          </div>
+
+          <!-- Sub items — each navigates independently -->
+          @if (expandedItem === item.label) {
+            <div class="sub-nav">
+              @for (child of item.children; track child.route) {
+                <a
+                  class="nav-item sub-item"
+                  [routerLink]="child.route"
+                  routerLinkActive="active"
+                  (click)="$event.stopPropagation()"
+                >
+                  {{ child.label }}
+                </a>
+              }
+            </div>
+          }
+        } @else {
+          <!-- Regular nav item -->
+          <a
+            class="nav-item"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            {{ item.label }}
+          </a>
+        }
+      }
+    </nav>
+
+    <!-- Content area — only this part changes on navigation -->
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

@@ -1,0 +1,22 @@
+<div class="dashboard">
+  <div class="page-header">
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-sub">
+      @if (loading()) {
+        Loading...
+      } @else {
+        {{ message() }}
+      }
+    </p>
+  </div>
+
+  <div class="cards-grid">
+    @for (card of cards; track card.route) {
+      <a class="panel-card" [routerLink]="card.route" [style.background]="card.color">
+        <div class="card-label">{{ card.label }}</div>
+        <div class="card-desc">{{ card.desc }}</div>
+        <span class="card-arrow">→</span>
+      </a>
+    }
+  </div>
+</div>

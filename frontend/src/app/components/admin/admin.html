@@ -1,0 +1,33 @@
+<div class="panel">
+  <div class="panel-header admin-header">
+    <div class="panel-badge">Admin</div>
+    <h1 class="panel-title">Admin Panel</h1>
+    <p class="panel-sub">Full system access — manage users, roles, and settings.</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">Loading...</div>
+  } @else if (error()) {
+    <div class="alert-error">{{ error() }}</div>
+  } @else {
+    <div class="server-msg admin-msg">
+      <span class="msg-icon">🔐</span>
+      <span>{{ message() }}</span>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-label">Access Level</div>
+        <div class="info-value">Full Access</div>
+      </div>
+      <div class="info-card">
+        <div class="info-label">Permissions</div>
+        <div class="info-value">All Roles</div>
+      </div>
+      <div class="info-card">
+        <div class="info-label">Protected Route</div>
+        <div class="info-value">/api/users/admin</div>
+      </div>
+    </div>
+  }
+</div>

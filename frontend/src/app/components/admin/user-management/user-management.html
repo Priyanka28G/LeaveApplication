@@ -1,0 +1,180 @@
+<div class="page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">User Management</h1>
+      <p class="page-sub">Manage users and assign roles across your organisation</p>
+    </div>
+    <button class="refresh-btn" (click)="loadUsers()">↻ Refresh</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Users</div>
+      <div class="stat-value">{{ stats().total }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Admins</div>
+      <div class="stat-value red">{{ stats().admins }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Managers</div>
+      <div class="stat-value green">{{ stats().managers }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Employees</div>
+      <div class="stat-value purple">{{ stats().employees }}</div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <input
+      class="search-input"
+      type="text"
+      placeholder="Search by name or email..."
+      (input)="setSearch($event)"
+    />
+    <div class="filter-tabs">
+      @for (role of ['all', 'admin', 'manager', 'employee']; track role) {
+        <button class="tab-btn" [class.active]="filterRole() === role" (click)="setFilter(role)">
+          {{ role | titlecase }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="state-box">Loading users...</div>
+  }
+
+  <!-- Error -->
+  @else if (error()) {
+    <div class="state-box error">{{ error() }}</div>
+  }
+
+  <!-- Empty -->
+  @else if (filtered().length === 0) {
+    <div class="empty-box">
+      <div class="empty-icon">👥</div>
+      <p class="empty-title">No users found</p>
+      <p class="empty-sub">Try adjusting your search or filter.</p>
+    </div>
+  }
+
+  <!-- User table -->
+  @else {
+    <div class="table-card">
+      <table class="user-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of filtered(); track user._id) {
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="avatar" [class]="avatarColor(user.role)">
+                    {{ user.username.charAt(0).toUpperCase() }}
+                  </div>
+                  <span class="username">{{ user.username }}</span>
+                </div>
+              </td>
+              <td class="email-cell">{{ user.email }}</td>
+              <td>
+                <span [class]="roleBadgeClass(user.role)">{{ user.role }}</span>
+              </td>
+              <td>{{ formatDate(user.createdAt) }}</td>
+              <td>
+                <button class="assign-btn" (click)="openRoleModal(user)">✎ Assign Role</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<!-- Role Assignment Modal -->
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Assign Role</h2>
+        <button class="modal-close" (click)="closeModal()">✕</button>
+      </div>
+
+      <!-- User info -->
+      <div class="modal-user">
+        <div class="avatar avatar-lg" [class]="avatarColor(selectedUser()!.role)">
+          {{ selectedUser()!.username.charAt(0).toUpperCase() }}
+        </div>
+        <div>
+          <div class="modal-username">{{ selectedUser()!.username }}</div>
+          <div class="modal-email">{{ selectedUser()!.email }}</div>
+        </div>
+      </div>
+
+      <!-- Current role -->
+      <div class="current-role">
+        Current role:
+        <span [class]="roleBadgeClass(selectedUser()!.role)">{{ selectedUser()!.role }}</span>
+      </div>
+
+      <!-- Role selection -->
+      <form [formGroup]="roleForm" (ngSubmit)="submitRoleUpdate()">
+        <div class="role-options">
+          @for (role of roles; track role) {
+            <label class="role-option" [class.selected]="roleForm.get('role')!.value === role">
+              <input type="radio" formControlName="role" [value]="role" />
+              <div class="role-option-inner">
+                <span class="role-icon">
+                  {{ role === 'admin' ? '🔐' : role === 'manager' ? '📋' : '👤' }}
+                </span>
+                <div>
+                  <div class="role-name">{{ role | titlecase }}</div>
+                  <div class="role-desc">
+                    {{
+                      role === 'admin'
+                        ? 'Full system access'
+                        : role === 'manager'
+                          ? 'Team management access'
+                          : 'Standard employee access'
+                    }}
+                  </div>
+                </div>
+              </div>
+            </label>
+          }
+        </div>
+
+        @if (roleUpdateSuccess()) {
+          <div class="alert alert-success">{{ roleUpdateSuccess() }}</div>
+        }
+        @if (roleUpdateError()) {
+          <div class="alert alert-error">{{ roleUpdateError() }}</div>
+        }
+
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeModal()">Cancel</button>
+          <button
+            type="submit"
+            class="confirm-btn"
+            [disabled]="roleForm.invalid || actionLoading() === selectedUser()?._id"
+          >
+            {{ actionLoading() === selectedUser()?._id ? 'Updating...' : 'Confirm Role' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

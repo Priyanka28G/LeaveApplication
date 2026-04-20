@@ -1,0 +1,53 @@
+<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh">
+  <div class="card shadow-sm p-4" style="width: 100%; max-width: 500px">
+    <h4 class="mb-4 fw-semibold text-center">Login</h4>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <!-- Username -->
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input
+          type="text"
+          class="form-control"
+          id="username"
+          placeholder="e.g. john.doe"
+          autocomplete="username"
+          formControlName="username"
+          [class.is-invalid]="username.invalid && username.touched"
+          [class.is-valid]="username.valid && username.touched"
+        />
+        <div class="invalid-feedback">
+          <span *ngIf="username.errors?.['required']">Username is required.</span>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="password"
+          formControlName="password"
+          placeholder="Min. 4 characters"
+          [class.is-invalid]="password.invalid && password.touched"
+          [class.is-valid]="password.valid && password.touched"
+        />
+        <div class="invalid-feedback">
+          <span *ngIf="password.errors?.['required']">Password is required.</span>
+        </div>
+      </div>
+
+      <div *ngIf="loginFailed" class="alert alert-danger py-2 mb-3" role="alert">
+        Invalid Credentials !
+      </div>
+
+      <!-- Buttons -->
+      <div class="d-flex align-items-center gap-3">
+        <button type="submit" class="btn btn-primary px-4">Login</button>
+        <span style="font-size: 14px; color: #6c757d"
+          >New User? <a routerLink="/register">register</a></span
+        >
+      </div>
+    </form>
+  </div>
+</div>

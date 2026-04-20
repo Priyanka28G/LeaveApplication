@@ -1,0 +1,118 @@
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+/>
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh">
+  <div class="card shadow-sm p-4" style="width: 100%; max-width: 500px">
+    <h4 class="mb-4 fw-semibold text-center">Register</h4>
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <!-- Username -->
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input
+          type="text"
+          class="form-control"
+          id="username"
+          placeholder="e.g. john.doe"
+          autocomplete="username"
+          formControlName="username"
+          [class.is-invalid]="username.invalid && username.touched"
+          [class.is-valid]="username.valid && username.touched"
+        />
+        <div class="invalid-feedback">
+          <span *ngIf="username.errors?.['required']">Username is required.</span>
+          <span *ngIf="username.errors?.['minlength']">Minimum 3 characters required.</span>
+          <span *ngIf="username.errors?.['pattern']"
+            >Only lowercase letters, numbers, and dots allowed.</span
+          >
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="mb-3">
+        <label for="email" class="form-label">Email address</label>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          placeholder="e.g. john.doe@company.com"
+          autocomplete="email"
+          formControlName="email"
+          [class.is-invalid]="email.invalid && email.touched"
+          [class.is-valid]="email.valid && email.touched"
+        />
+        <div class="invalid-feedback">
+          <span *ngIf="email.errors?.['required']">Email is required.</span>
+          <span *ngIf="email.errors?.['email']">Please enter a valid email address.</span>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="password"
+          formControlName="password"
+          placeholder="Min. 4 characters"
+          [class.is-invalid]="password.invalid && password.touched"
+          [class.is-valid]="password.valid && password.touched"
+        />
+        <div class="invalid-feedback">
+          <span *ngIf="password.errors?.['required']">Password is required.</span>
+          <span *ngIf="password.errors?.['minlength']"
+            >Password must be at least 4 characters.</span
+          >
+        </div>
+      </div>
+
+      <!-- Repeat Password -->
+      <div class="mb-3">
+        <label for="repeatPassword" class="form-label">Repeat password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="repeatPassword"
+          placeholder="Re-enter your password"
+          formControlName="repeatPassword"
+          [class.is-invalid]="repeatPassword.invalid && repeatPassword.touched"
+          [class.is-valid]="repeatPassword.valid && repeatPassword.touched"
+        />
+        <div class="invalid-feedback">
+          <span *ngIf="repeatPassword.errors?.['required']">Please confirm your password.</span>
+          <span *ngIf="repeatPassword.errors?.['passwordMismatch']">Passwords do not match.</span>
+        </div>
+      </div>
+
+      <!-- Role -->
+      <div class="mb-4">
+        <label for="role" class="form-label">Role</label>
+        <select
+          class="form-select"
+          id="role"
+          formControlName="role"
+          [class.is-invalid]="role.invalid && role.touched"
+          [class.is-valid]="role.valid && role.touched"
+        >
+          <option value="" disabled selected>Select a role</option>
+          <option value="admin">Admin</option>
+          <option value="manager">Manager</option>
+          <option value="employee">Employee</option>
+        </select>
+        <div class="invalid-feedback">
+          <span *ngIf="role.errors?.['required']">Please select a role.</span>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="d-flex align-items-center gap-3">
+        <button type="submit" class="btn btn-primary px-4">Register</button>
+        <span style="font-size: 14px; color: #6c757d"
+          >Already registered? <a routerLink="/">Sign In</a></span
+        >
+      </div>
+    </form>
+  </div>
+</div>

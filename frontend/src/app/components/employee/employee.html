@@ -1,0 +1,33 @@
+<div class="panel">
+  <div class="panel-header employee-header">
+    <div class="panel-badge">Employee</div>
+    <h1 class="panel-title">Employee Panel</h1>
+    <p class="panel-sub">Employee-level access — view your profile and leave status.</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">Loading...</div>
+  } @else if (error()) {
+    <div class="alert-error">{{ error() }}</div>
+  } @else {
+    <div class="server-msg employee-msg">
+      <span class="msg-icon">👤</span>
+      <span>{{ message() }}</span>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-label">Access Level</div>
+        <div class="info-value">Employee + Admin</div>
+      </div>
+      <div class="info-card">
+        <div class="info-label">Permissions</div>
+        <div class="info-value">Own Data</div>
+      </div>
+      <div class="info-card">
+        <div class="info-label">Protected Route</div>
+        <div class="info-value">/api/users/employee</div>
+      </div>
+    </div>
+  }
+</div>

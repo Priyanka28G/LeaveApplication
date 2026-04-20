@@ -1,0 +1,102 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Apply Leave</h1>
+      <p class="page-sub">Submit a new leave request</p>
+    </div>
+    <a class="back-btn" routerLink="/app/my-leaves">← My Leaves</a>
+  </div>
+
+  <div class="form-card">
+    <!-- Success -->
+    @if (success()) {
+      <div class="alert alert-success">{{ success() }}</div>
+    }
+
+    <!-- Error -->
+    @if (error()) {
+      <div class="alert alert-error">{{ error() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <!-- Leave Type -->
+      <div class="field" [class.field-error]="leaveType.invalid && leaveType.touched">
+        <label>Leave type</label>
+        <select formControlName="leaveType">
+          <option value="" disabled>Select leave type</option>
+          @for (type of leaveTypes; track type) {
+            <option [value]="type">{{ type | titlecase }}</option>
+          }
+        </select>
+        @if (leaveType.hasError('required') && leaveType.touched) {
+          <span class="err-msg">Please select a leave type.</span>
+        }
+      </div>
+
+      <!-- Date Row -->
+      <div class="date-row">
+        <div class="field" [class.field-error]="startDate.invalid && startDate.touched">
+          <label>Start date</label>
+          <input type="date" formControlName="startDate" [min]="today" />
+          @if (startDate.hasError('required') && startDate.touched) {
+            <span class="err-msg">Start date is required.</span>
+          }
+        </div>
+
+        <div class="field" [class.field-error]="endDate.invalid && endDate.touched">
+          <label>End date</label>
+          <input type="date" formControlName="endDate" [min]="startDate.value || today" />
+          @if (endDate.hasError('required') && endDate.touched) {
+            <span class="err-msg">End date is required.</span>
+          }
+        </div>
+      </div>
+
+      <!-- Date range error -->
+      @if (form.hasError('dateRange') && endDate.touched) {
+        <div class="alert alert-error" style="margin-top: -8px; margin-bottom: 16px">
+          End date must be on or after start date.
+        </div>
+      }
+
+      <!-- Days preview -->
+      @if (totalDays() > 0) {
+        <div class="days-preview">
+          <span class="days-count">{{ totalDays() }}</span>
+          <span class="days-label">{{ totalDays() === 1 ? 'day' : 'days' }} requested</span>
+        </div>
+      }
+
+      <!-- Reason -->
+      <div class="field" [class.field-error]="reason.invalid && reason.touched">
+        <label>Reason <span class="hint">(min 10 characters)</span></label>
+        <textarea
+          formControlName="reason"
+          rows="4"
+          placeholder="Describe the reason for your leave..."
+        ></textarea>
+        <div class="char-count" [class.char-error]="reason.value?.length < 10">
+          {{ reason.value?.length || 0 }} / 10 min
+        </div>
+        @if (reason.hasError('required') && reason.touched) {
+          <span class="err-msg">Reason is required.</span>
+        }
+        @if (reason.hasError('minlength') && reason.touched) {
+          <span class="err-msg">Reason must be at least 10 characters.</span>
+        }
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <a class="cancel-btn" routerLink="/my-leaves">Cancel</a>
+        <button type="submit" class="submit-btn" [disabled]="loading()">
+          @if (loading()) {
+            Submitting...
+          } @else {
+            Submit Request
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
